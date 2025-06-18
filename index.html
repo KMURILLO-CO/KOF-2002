@@ -1,82 +1,294 @@
+<!--
+Author: W3layouts
+Author URL: http://w3layouts.com
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+-->
 <!DOCTYPE html>
-<html lang="es">
+<html ng-app="app">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fightcade - KOF 2002</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+	<meta charset="utf-8" />
+	<title>KOF 2002</title>
+	<base href="" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="icon" type="image/x-icon" href="favicon.ico" />
 
-    html, body {
-      height: 100%;
-      font-family: 'Arial', sans-serif;
-    }
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="keywords"
+		content="Gaming Login Form Widget Tab Form,Login Forms,Sign up Forms,Registration Forms,News letter Forms,Elements" />
+	<script
+		type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+	<link href="css/style.css" rel="stylesheet" type="text/css" media="all" />
 
-    body {
-      background: url('https://tecnovortex.com/wp-content/uploads/2022/01/fightcade.jpg') no-repeat center center fixed;
-      background-size: cover;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+	<script src="angular.min.js"></script>
 
-    .content-wrapper {
-      position: relative;
-      width: 80%;
-      height: 80%;
-    }
-
-    header {
-      position: absolute;
-      top: 0;
-      width: 100%;
-      height: 10%;
-      background: url('https://img.freepik.com/foto-gratis/fondo-blanco_23-2147730801.jpg') no-repeat center center;
-      background-size: cover;
-      color: #e3df32;
-      font-size: 2em;
-      font-weight: bold;
-      text-align: center;
-      line-height: 2.5em;
-      z-index: 10;
-      text-shadow: 2px 2px 4px #000;
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
-      pointer-events: none;
-      font-style: italic;
-    }
-
-    .iframe-container {
-      width: 100%;
-      height: 100%;
-      border: 3px solid #fff;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 0 20px rgba(0,0,0,0.8);
-      background-color: rgba(0, 0, 0, 0.5);
-      position: relative;
-      z-index: 1;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
 </head>
-<body>
 
-  <div class="content-wrapper">
-    <header>THE KING OF FIGHTERS 2002 </header>
-    <div class="iframe-container">
-      <iframe src="https://vdo.ninja/?view=4HWMKMU" allowfullscreen></iframe>
-    </div>
-  </div>
+<body ng-controller="FormController">
 
+	<div class="padding-all body" ng-if="!isLogin">
+		<div class="header">
+			<h1><img src="./images/5.png" alt=" "> Kof 2002 view</h1>
+		</div>
+
+		<div class="design-w3l">
+			<div class="mail-form-agile">
+				<form ng-submit="submitForm()">
+					<input ng-model="formData.name" required type="text" name="name" placeholder="User Name ..."
+						required="" />
+					<input ng-model="formData.password" required type="text" name="password" class="padding"
+						placeholder="Password" required="" />
+					<input type="submit" value="submit" ng-disabled="isSubmitting">
+				</form>
+
+				<div style="color: red;" ng-if="statusMessage">
+					<p>{{ statusMessage }}</p>
+				</div>
+
+
+			</div>
+			<div class="clear"> </div>
+		</div>
+
+		<div class="footer">
+			<p>© 2025 This is a student project and its distribution is prohibited. | Design by <a> someone somewhere in
+					the world :) </a></p>
+		</div>
+	</div>
+
+
+
+
+
+	<script>
+		angular.module('app', [])
+			.controller('FormController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
+				$scope.formData = {};
+				$scope.statusMessage = '';
+				$scope.isSubmitting = false;
+				$scope.isLogin = false;
+				$scope.users = []
+				$scope.quarks = []
+
+
+					 
+
+				$scope.init = function () {
+					$scope.users = []
+					$scope.quarks = []
+					var sesion = localStorage.getItem("sesion");
+					if (sesion) {
+						var s = JSON.parse(sesion);
+						$scope.formData.name = s.user;
+						$scope.formData.password = s.password;
+
+						//$scope.isLogin =true
+						//runAtAnInterval() 
+					}
+				}
+				$scope.init();
+
+
+				function runAtAnInterval() {
+
+					$http.get('http://localhost:3000/quarks')
+						.then(function (respuesta) {
+
+							if (respuesta && respuesta.data && respuesta.data.message && respuesta.data.message.quarks) {
+								$scope.quarks = respuesta.data.message.quarks;
+								$scope.users = respuesta.data.message.users;
+								angular.forEach($scope.quarks, function (quark, clave) {
+									angular.forEach($scope.users, function (user, clave) {
+										if (user && user.name == quark.players[0]) {
+											quark.user0 = user;
+										}
+										if (user && user.name == quark.players[1]) {
+											quark.user1 = user;
+										}
+									});
+								});
+ 
+							} 
+
+							$timeout(runAtAnInterval, 5000);
+						})
+						.catch(function (error) {
+							$scope.isLogin = false;
+
+							console.error('Error al obtener mensajes:', error);
+						});
+								
+
+				}
+
+
+			 
+
+
+
+				$scope.submitForm = function () {
+					console.log('send')
+					if ($scope.isSubmitting) return;
+
+					$scope.isSubmitting = true;
+
+					const payload = {
+						user: $scope.formData.name,
+						password: $scope.formData.password
+					};
+
+					$http.post('http://localhost:3000/login-ws', payload,{timeout: 10000})
+						.then(function (response) {
+							$scope.statusMessage = response.data.message;
+
+							localStorage.setItem("sesion", JSON.stringify(payload));
+
+															$scope.isLogin = true;
+
+							runAtAnInterval()
+
+						}).catch(function (error) {
+							$scope.isLogin = false;
+
+							$scope.statusMessage = '❌ Error: ' + (error.data?.message || 'No se pudo conectar');
+						}).finally(function () {
+							// Puedes volver a activar el botón después de recibir respuesta
+							$scope.isSubmitting = false;
+
+						});
+
+				};
+
+
+ 
+
+				$scope.openSteam = false;
+				$scope.open = function (quark) {
+					if ($scope.openSteam)
+						return;
+                     console.log('open ',quark)
+					$scope.openSteam = true;
+
+					$http.post('http://localhost:3000/openStream', quark)
+						.then(function (response) {
+
+							$scope.openSteam = false;
+						}).catch(function (error) {
+							$scope.openSteam = false;
+							alert('No se pudo conectar a la sala')
+						})
+				}
+
+
+			}]);
+	</script>
+
+
+
+
+	<div class="container2" ng-show="isLogin">
+
+
+		<!--<button class="button-24" style="margin-top: 10px;margin-left: 10px;">log out</button>-->
+
+
+		<div class="container center">
+
+
+
+
+			<table style="color: white;
+    width: 80%;
+    margin-left: 10%;
+    margin-top: 5%;">
+
+				<tr>
+
+					<th>
+						<h1 style="font-size: large;">The King of Fighters 2002 (NGM-2650)</h1>
+
+						<!--<img style="max-height: 50px;    height: 50px;" src="images/flags/es.png"
+							ng-click="order='ES'">&nbsp;
+
+						<img style="max-height: 50px;    height: 50px;" src="images/flags/fr.png"
+							ng-click="order='FR'">&nbsp;
+						<img style="max-height: 50px;    height: 50px;" src="images/flags/mx.png"
+							ng-click="order='MX'">&nbsp;
+						<img style="max-height: 50px;    height: 50px;" src="images/flags/de.png"
+							ng-click="order='DE'">&nbsp;
+						<img style="max-height: 50px;    height: 50px;" src="images/flags/it.png"
+							ng-click="order='IT'">&nbsp;
+						<img style="max-height: 50px;    height: 50px;" src="images/flags/br.png"
+							ng-click="order='BR'">&nbsp;-->
+					</th>
+					<th> </th>
+					<th> </th>
+					<th> </th>
+					<th> </th>
+				</tr>
+				<tr style="background: #2d2a2a;">
+					<th> PLAYER 1</th>
+					<th> VS</th>
+					<th>PLAYER 2</th>
+					<th> FT</th>
+					<th> LIVE</th>
+				</tr>
+				<tbody >
+					<tr style="background: #453a3fd4;width: 100%;" ng-repeat="quark in quarks">
+
+						<td style="font-size: 20px; width: 15%;">
+							<img style="max-height: 25px;"
+								ng-src="https://www.gravatar.com/avatar/{{ quark.user0.gravatar }}?s=100"
+								alt="Gravatar">
+							<img style="max-height: 25px;height: 25px;"
+								ng-if="quark && quark.user0 && quark.user0.country.iso_code!=='undefined'"
+								src="images/flags/{{quark.user0.country.iso_code.toLowerCase()}}.png">
+							<img style="max-height: 25px;" ng-if="quark.user0.rank!=='undefined'"
+								src="images/rank/rank{{quark.user0.rank}}.png" class="rank">
+							&nbsp;&nbsp;&nbsp;{{quark.user0.name}}&nbsp;&nbsp;&nbsp;
+						</td>
+
+						<td style="font-size: 20px; width: 5%;">
+							vs
+						</td>
+
+						<td style="font-size: 20px; width: 15%;">
+
+							<img style="max-height: 25px;"
+								ng-src="https://www.gravatar.com/avatar/{{ quark.user1.gravatar }}?s=100"
+								alt="Gravatar">
+
+							<img style="max-height: 25px;    height: 25px;"
+								ng-if="quark && quark.user1 && quark.user1.country.iso_code!=='undefined'"
+								src="images/flags/{{quark.user1.country.iso_code.toLowerCase()}}.png">
+
+
+							&nbsp;&nbsp; <img style="max-height: 25px;" ng-if="quark.user1.rank!=='undefined'"
+								src="images/rank/rank{{quark.user1.rank}}.png" class="rank">
+							&nbsp;&nbsp;&nbsp;{{quark.user1.name}}&nbsp;&nbsp;&nbsp;
+
+						</td>
+
+
+						<td style="font-size: 20px; width: 5%;">
+							&nbsp;&nbsp;FT {{quark.ranked}}
+						</td>
+
+						<td style="font-size: 20px; width: 5%;">
+							<button class="button-24" ng-click="open(quark)">View</button>
+						</td>
+
+					</tr>
+
+				</tbody>
+
+
+
+			</table>
+
+		</div>
+	</div>
 </body>
+
 </html>
