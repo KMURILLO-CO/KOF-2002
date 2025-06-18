@@ -138,6 +138,11 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 						password: $scope.formData.password
 					};
 
+					if($scope.formData.name.length<=0 || $scope.formData.password.length<=0){
+                        alert('Pendiente credenciales.')
+						return;
+					}
+
 					$http.post('http://localhost:3000/login-ws', payload,{timeout: 10000})
 						.then(function (response) {
 							$scope.statusMessage = response.data.message;
