@@ -72,11 +72,13 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 				$scope.quarks = []
 
 
-					 
+
 
 				$scope.init = function () {
 					$scope.users = []
 					$scope.quarks = []
+					$scope.isSubmitting = false;
+
 					var sesion = localStorage.getItem("sesion");
 					if (sesion) {
 						var s = JSON.parse(sesion);
@@ -108,8 +110,8 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 										}
 									});
 								});
- 
-							} 
+
+							}
 
 							$timeout(runAtAnInterval, 5000);
 						})
@@ -118,38 +120,37 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 
 							console.error('Error al obtener mensajes:', error);
 						});
-								
+
 
 				}
 
 
-			 
+
 
 
 
 				$scope.submitForm = function () {
-					console.log('send')
-					if ($scope.isSubmitting) return;
-
 					$scope.isSubmitting = true;
+					if ($scope.formData.name == undefined ||
+						$scope.formData.password == undefined ||
+						$scope.formData.name.length <= 0 || $scope.formData.password.length <= 0) {
+						alert('Pendiente credenciales.')
+						$scope.isSubmitting = false;
+						return;
+					}
 
 					const payload = {
 						user: $scope.formData.name,
 						password: $scope.formData.password
 					};
 
-					if($scope.formData.name.length<=0 || $scope.formData.password.length<=0){
-                        alert('Pendiente credenciales.')
-						return;
-					}
-
-					$http.post('http://localhost:3000/login-ws', payload,{timeout: 10000})
+					$http.post('http://localhost:3000/login-ws', payload, { timeout: 10000 })
 						.then(function (response) {
 							$scope.statusMessage = response.data.message;
 
 							localStorage.setItem("sesion", JSON.stringify(payload));
 
-															$scope.isLogin = true;
+							$scope.isLogin = true;
 
 							runAtAnInterval()
 
@@ -166,13 +167,13 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 				};
 
 
- 
+
 
 				$scope.openSteam = false;
 				$scope.open = function (quark) {
 					if ($scope.openSteam)
 						return;
-                     console.log('open ',quark)
+					console.log('open ', quark)
 					$scope.openSteam = true;
 
 					$http.post('http://localhost:3000/openStream', quark)
@@ -239,7 +240,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 					<th> FT</th>
 					<th> LIVE</th>
 				</tr>
-				<tbody >
+				<tbody>
 					<tr style="background: #453a3fd4;width: 100%;" ng-repeat="quark in quarks">
 
 						<td style="font-size: 20px; width: 15%;">
