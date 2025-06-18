@@ -151,7 +151,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 						}).catch(function (error) {
 							$scope.isLogin = false;
 
-							$scope.statusMessage = '❌ Error: ' + (error.data?.message || 'No se pudo conectar');
+							$scope.statusMessage = 'Error:  No se pudo conectar';
 						}).finally(function () {
 							// Puedes volver a activar el botón después de recibir respuesta
 							$scope.isSubmitting = false;
